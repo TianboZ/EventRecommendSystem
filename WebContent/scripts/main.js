@@ -12,27 +12,45 @@
 	 * Initialize
 	 */
 	function init() {
-		console.log('init()');
 		// Register event listeners
 		$('login-btn').addEventListener('click', login);
+		$('create-user-btn').addEventListener('click', showSignupForm);
+		$('signup-btn').addEventListener('click', signup);
+		$('back-btn').addEventListener('click', backToLoginForm);
 		$('nearby-btn').addEventListener('click', loadNearbyItems);
 		$('fav-btn').addEventListener('click', loadFavoriteItems);
 		$('recommend-btn').addEventListener('click', loadRecommendedItems);
+		
+		var signupForm = $('signup-form');
+		hideElement(signupForm);
+		
+		validateSession();
 
-		// validateSession();
-		// 注意！！！ 如果需要登陆的话，在没登录的状态下，页面仍然是餐厅推荐，而且不能操作。
-		// 只有登陆进去之后，才会显示event 推荐
-		onSessionValid({
-			user_id : '1111',
-			name : 'John Smith'
-		});
+//		 onSessionValid({
+//		 user_id : '123',
+//		 name : 'Jiepeng Sun'
+//		 });
+	}
+	
+	// Change Forms
+	function showSignupForm() {
+		var loginForm = $('login-form');
+		var signupForm = $('signup-form');
+		hideElement(loginForm);
+		showElement(signupForm);
+	}
+	
+	function backToLoginForm() {
+		var loginForm = $('login-form');
+		var signupForm = $('signup-form');
+		showElement(loginForm);
+		hideElement(signupForm);
 	}
 
 	/**
 	 * Session
 	 */
 	function validateSession() {
-		console.log('validateSession()');
 		// The request parameters
 		var url = './login';
 		var req = JSON.stringify({});
@@ -53,8 +71,6 @@
 	}
 
 	function onSessionValid(result) {
-		console.log('onSessionValid()');
-
 		user_id = result.user_id;
 		user_fullname = result.name;
 
@@ -78,8 +94,6 @@
 	}
 
 	function onSessionInvalid() {
-		console.log('onSessionInvalid()');
-
 		var loginForm = $('login-form');
 		var itemNav = $('item-nav');
 		var itemList = $('item-list');
@@ -97,7 +111,6 @@
 	}
 
 	function initGeoLocation() {
-		console.log('initGeoLocation()');
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(onPositionUpdated,
 					onLoadPositionFailed, {
@@ -110,7 +123,6 @@
 	}
 
 	function onPositionUpdated(position) {
-		console.log('onPositionUpdated()');
 		lat = position.coords.latitude;
 		lng = position.coords.longitude;
 
@@ -118,13 +130,11 @@
 	}
 
 	function onLoadPositionFailed() {
-		console.log('onLoadPositionFailed()');
 		console.warn('navigator.geolocation is not available');
 		getLocationFromIP();
 	}
 
 	function getLocationFromIP() {
-		console.log('getLocationFromIP()');
 		// Get location from http://ipinfo.io/json
 		var url = 'http://ipinfo.io/json'
 		var req = null;
@@ -146,7 +156,6 @@
 	// -----------------------------------
 
 	function login() {
-		console.log('login()');
 		var username = $('username').value;
 		var password = $('password').value;
 		password = md5(username + md5(password));
@@ -179,6 +188,54 @@
 	function clearLoginError() {
 		$('login-error').innerHTML = '';
 	}
+	
+	// -----------------------------------
+	// Sign Up
+	// -----------------------------------
+	function signup() {
+		var firstname = $('firstname').value;
+		var lastname = $('lastname').value;
+		var username = $('newusername').value;
+		var password = $('newpassword').value;
+		password = md5(username + md5(password));
+		
+		if(username == "") {
+			showSignupError("Please Enter User Name, You Need To Login With Username");
+			return;
+		}
+		
+		if(password == "") {
+			showSignupError("Please Enter Your Password");
+			return;
+		}
+		
+		// The request parameters
+		var url = './adduser';
+		var params = 'firstname=' + firstname + '&lastname=' + lastname + '&user_id=' + username + '&password=' + password;
+		var req = JSON.stringify({});
+
+		ajax('POST', url + '?' + params, req,
+		// successful callback
+		function(res) {
+			var result = JSON.parse(res);
+
+			// successfully logged in
+			if (result.status === 'OK') {
+//				onSessionValid(result);
+				onSessionValid(result);
+			}
+		},
+		// error
+		function() {
+			showSignupError("This User ID Is Already In Use, Please Change Another One");
+		});
+		
+	}
+	
+	function showSignupError(s) {
+		$('signup-error').innerHTML = s;
+	}
+	
 	// -----------------------------------
 	// Helper Functions
 	// -----------------------------------
@@ -190,8 +247,6 @@
 	 *            The id of the navigation button
 	 */
 	function activeBtn(btnId) {
-		console.log('activeBtn()');
-		// 把所有active的class replace成' ', 只把btnId 的class进行active
 		var btns = document.getElementsByClassName('main-nav-btn');
 
 		// deactivate all navigation buttons
@@ -230,7 +285,6 @@
 	 * @returns
 	 */
 	function $(tag, options) {
-		console.log('$()');
 		if (!options) {
 			return document.getElementById(tag);
 		}
@@ -268,22 +322,17 @@
 	 *            This is the failed callback
 	 */
 	function ajax(method, url, data, callback, errorHandler) {
-		console.log('ajax()');
 		var xhr = new XMLHttpRequest();
 
 		xhr.open(method, url, true);
 
 		xhr.onload = function() {
-			switch (xhr.status) {
-			case 200:
+			if (xhr.status === 200) {
 				callback(xhr.responseText);
-				break;
-			case 403:
+			} else if (xhr.status === 403) {
 				onSessionInvalid();
-				break;
-			case 401:
+			} else {
 				errorHandler();
-				break;
 			}
 		};
 
@@ -311,7 +360,6 @@
 	 */
 	function loadNearbyItems() {
 		console.log('loadNearbyItems');
-		console.log('lat' + lat + '   lon' + lng);
 		activeBtn('nearby-btn');
 
 		// The request parameters
@@ -337,8 +385,6 @@
 		function() {
 			showErrorMessage('Cannot load nearby items.');
 		});
-
-		console.log('loadNearbyItems done!');
 	}
 
 	/**
@@ -569,6 +615,4 @@
 	init();
 
 })();
-
-// END
 
