@@ -30,13 +30,16 @@ public class RpcHelper {
 	    return null;
 	  }
 
+	  // note: return JSON format to front-end
+	  
 	  // Writes a JSONObject to http response.
 	  public static void writeJsonObject(HttpServletResponse response, JSONObject obj) {
 	    try {
-	      response.setContentType("application/json");
+	      response.setContentType("application/json"); // content type, JSON
 	      response.addHeader("Access-Control-Allow-Origin", "*");
 	      PrintWriter out = response.getWriter();
 	      out.print(obj);
+	      // send response back to client
 	      out.flush();
 	      out.close();
 	    } catch (Exception e) {
@@ -47,10 +50,11 @@ public class RpcHelper {
 	  // Writes a JSONArray to http response.
 	  public static void writeJsonArray(HttpServletResponse response, JSONArray array) {
 	    try {
-	      response.setContentType("application/json");
+	      response.setContentType("application/json"); // content type, JSON
 	      response.addHeader("Access-Control-Allow-Origin", "*");
 	      PrintWriter out = response.getWriter();
 	      out.print(array);
+	      // send response back to client
 	      out.flush();
 	      out.close();
 	    } catch (Exception e) {

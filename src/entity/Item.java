@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Item {
-	// fields since it is private, so they can not be de-referenenced
 	private String itemId;
 	private String name;
 	private double rating;
@@ -25,7 +24,6 @@ public class Item {
 	private String snippet;
 	private String snippetUrl;
 
-	// 每一个field 对应一个set函数
 	public String getItemId() {
 		return itemId;
 	}
@@ -90,7 +88,7 @@ public class Item {
 		return snippetUrl;
 	}
 
-	// front end can only understand JSON
+	// JSON format used for 跨互联网通讯
 	public JSONObject toJSONObject() {
 		JSONObject obj = new JSONObject();
 		try {

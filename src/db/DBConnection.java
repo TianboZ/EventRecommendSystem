@@ -19,6 +19,7 @@ public interface DBConnection {
 	 * @param lon
 	 * @param term
 	 *            (Nullable)
+	 *            it is category 
 	 * @return list of items
 	 */
 	public List<Item> searchItems(String userId, double lat, double lon, String term);

@@ -42,10 +42,10 @@ public class MySQLConnection implements DBConnection {
 	
 	// search 相关
 	@Override
-	public List<Item> searchItems(String userId, double lat, double lon, String term) {
+	public List<Item> searchItems(String userId, double lat, double lon, String term) { // term is category 
 		// TODO Auto-generated method stub
 		// Connect to external API
-		ExternalAPI api = ExternalAPIFactory.getExternalAPI(); // moved here
+		ExternalAPI api = ExternalAPIFactory.getExternalAPI(); 
 		List<Item> items = api.search(lat, lon, term);
 		for (Item item : items) {
 			// Save the item into our own db.
@@ -55,6 +55,7 @@ public class MySQLConnection implements DBConnection {
 
 	}
 
+	// save each Item into database
 	@Override
 	public void saveItem(Item item) {
 		// TODO Auto-generated method stub
@@ -98,7 +99,6 @@ public class MySQLConnection implements DBConnection {
 	}
 
 	// history 相关
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void setFavoriteItems(String userId, List<String> itemIds) {
 		// TODO Auto-generated method stub
@@ -125,7 +125,7 @@ public class MySQLConnection implements DBConnection {
 		if (conn == null) {
 			return;
 		}
-		String query = "DELETE FROM history WHERE user_id = ? and item_id = ?";
+		String query = "DELETE FROM history WHERE user_id = ? and item_id = ?"; // user_id + item_id combination is not unique! they are all FK, PK is history_id
 		try {
 			PreparedStatement statement = conn.prepareStatement(query);
 			for (String itemId : itemIds) {
@@ -147,7 +147,7 @@ public class MySQLConnection implements DBConnection {
 		}
 		Set<String> favoriteItems = new HashSet<>();
 		try {
-			String sql = "SELECT item_id from history WHERE user_id = ?";
+			String sql = "SELECT item_id from history WHERE user_id = ?";   
 			PreparedStatement statement = conn.prepareStatement(sql);
 			statement.setString(1, userId);
 			ResultSet rs = statement.executeQuery();

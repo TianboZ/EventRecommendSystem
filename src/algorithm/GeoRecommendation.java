@@ -10,7 +10,6 @@ import java.util.Set;
 import db.DBConnection;
 import db.DBConnectionFactory;
 import entity.Item;
-import external.TicketMasterAPI;
 
 public class GeoRecommendation {
 	public List<Item> recommendItems(String userId, double lat, double lon) {

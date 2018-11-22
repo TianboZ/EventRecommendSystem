@@ -1,7 +1,6 @@
 package rpc;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -11,18 +10,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import db.DBConnection;
 import db.DBConnectionFactory;
 import entity.Item;
-import external.ExternalAPI;
-import external.ExternalAPIFactory;
-import external.TicketMasterAPI;
 
 /**
  * Servlet implementation class SearchItem
@@ -43,7 +37,7 @@ public class SearchItem extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-    // GET 对应doGet(...)
+    // if receive GET method, call this method. we need to parse request, then write the response
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Get parameter from HTTP request
 		String userId = request.getParameter("user_id");
@@ -53,13 +47,14 @@ public class SearchItem extends HttpServlet {
 		
 		// database connection
 		DBConnection conn = DBConnectionFactory.getDBConnection();
-		List<Item> items = conn.searchItems(userId, lat, lon, term); // search 完，直接就存到MySQL了
-		List<JSONObject> list = new ArrayList<>();
+		// call TicketMaster API to get JSON object array, parse them to get List<Item>, store them in the database
+		List<Item> items = conn.searchItems(userId, lat, lon, term); // term is categories
+		List<JSONObject> list = new ArrayList<>(); // List<Item> --> List<JSONObject>
 
 		Set<String> favorite = conn.getFavoriteItemIds(userId);
 		try {
 			for (Item item : items) {
-				JSONObject obj = item.toJSONObject();
+				JSONObject obj = item.toJSONObject(); // convert Item back to JSON object
 				if (favorite != null) {
 					obj.put("favorite", favorite.contains(item.getItemId()));
 				}
@@ -68,14 +63,14 @@ public class SearchItem extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		JSONArray array = new JSONArray(list);
-		RpcHelper.writeJsonArray(response, array);
+		JSONArray array = new JSONArray(list);// List<JSONObject> --> JSON array, return to front end
+		RpcHelper.writeJsonArray(response, array); // write response
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	// POST 对应doPost(...)
+	// if receive POST method, call this method
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);

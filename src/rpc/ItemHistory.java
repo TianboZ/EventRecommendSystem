@@ -34,6 +34,7 @@ public class ItemHistory extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
+    // 点击 favorites出现的东西
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -56,6 +57,7 @@ public class ItemHistory extends HttpServlet {
 		RpcHelper.writeJsonArray(response, array);
 	}
 
+	// set favorite，update db
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -81,7 +83,7 @@ public class ItemHistory extends HttpServlet {
 		}
 	}
 	
-	// 自己加的
+	// 拉黑，update db
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		try {

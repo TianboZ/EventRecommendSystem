@@ -133,7 +133,7 @@ public class MongoDBConnection implements DBConnection {
 		// TODO Auto-generated method stub
 		// Connect to external API
 		ExternalAPI api = ExternalAPIFactory.getExternalAPI();
-		List<Item> items = api.search(lat, lon, term);
+		List<Item> items = api.search(lat, lon, term);  // api is the instance of TicketMasterAPI class
 		for (Item item : items) {
 			// Save the item into our own db.
 			saveItem(item);

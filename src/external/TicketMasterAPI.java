@@ -21,8 +21,9 @@ public class TicketMasterAPI implements ExternalAPI {
 	private static final String DEFAULT_TERM = ""; // no restriction
 	private static final String API_KEY = "1EnorpxEnwJ6WE3VB0GssaUndZLujW2k";
 
+	// this is the only API we use!  Item is internal class, it is clerified, only contains fields we interested
 	@Override
-	public List<Item> search(double lat, double lon, String term) {
+	public List<Item> search(double lat, double lon, String term) {  
 		// create a base url, based on API_HOST and SEARCH_PATH
 		String url = "http://" + API_HOST + SEARCH_PATH;
 		// Convert geo location to geo hash with a precision of 4 (+- 20km)
@@ -80,6 +81,7 @@ public class TicketMasterAPI implements ExternalAPI {
 		return url;
 	}
 
+	// helper function to show JSON array returned from TicketMaster for debugging
 	private void queryAPI(double lat, double lon) {
 		List<Item> itemList = search(lat, lon, null);
 		try {
